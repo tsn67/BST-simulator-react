@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap');
+@import 'tailwindcss';
+
+@theme {
+    --font-primary: "Geist Mono", monospace; /* geist mono font you can use it as font-primary*/
+    --color-background: #0D141C;
+    --color-textGreenLight: #9BD678;
+    --color-nodeGreen: #234F27;
+    --color-secondaryGreen: #35726F; 
+    --color-textGreenDark: #299B96; 
+
+}
+
+/*
+ *  custome reusable colors can be changed here inside '@theme'
+ *
+ *
+ * */
+
