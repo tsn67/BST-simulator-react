@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import Node from '../components/Node';
 
 export default () => {
@@ -30,14 +30,19 @@ export default () => {
     const handleMouseLeave = () => setIsDragging(false);
 
     return (
-        <div className="min-h-screen min-w-screen bg-background flex flex-row ">
-            <div className="h-screen min-w-screen box-border bg-white ">
-                <h1>frame 1</h1>
-            </div>
+        <div
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            ref={containerRef}
+            className="h-screen w-screen bg-background flex flex-col items-center  overflow-scroll"
+        >
 
-            <div className="min-h-screen min-w-screen bg-yellow-200 box-border ">
-                <div className="min-h-screen min-w-screen grid place-content-center">1</div>
-                <div className="min-h-screen min-w-screen grid place-content-center">2</div>
+            <div className="flex flex-col gap-20">
+                {new Array(20).fill(0).map((element, index) => {
+                    return <Node value={index}></Node>;
+                })}
             </div>
         </div>
     );
