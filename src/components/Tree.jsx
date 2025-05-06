@@ -7,6 +7,7 @@ import Node from './Node';
 import panzoom from 'panzoom';
 import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 
+
 export default () => {
     const rootNode = TreeStore(state => state.root);
     const updateStatus = updateContollerStore(state => state.updateStatus);
@@ -25,8 +26,8 @@ export default () => {
 
         if (treeContainerRef.current) {
             const instance = panzoom(treeContainerRef.current, {
-                maxZoom: 1,
-                minZoom: 1,
+                maxZoom: 3,
+                minZoom: 0.6,
                 bounds: true,
                 boundsPadding: 0.01,
             });
@@ -75,15 +76,10 @@ export default () => {
 
 const TreeContainer = ({ xArrowIds, nodes, refObj, render }) => {
 
-    useEffect(() => {
-        const timeOut = setTimeout(() => {
-            useXarrow();
-        }, 100);
+    const updateStatus = updateContollerStore.getState().updateStatus;
 
-        return () => {
-            clearTimeout(timeOut);
-        }
-    }, []);
+    useEffect(() => {
+    }, [updateStatus]);
 
 
     return (
@@ -111,7 +107,7 @@ const TreeContainer = ({ xArrowIds, nodes, refObj, render }) => {
 
             {xArrowIds &&
                 xArrowIds.map((el, i) => {
-                    return <Xarrow start={`${el.start}`} end={`${el.end}`} color='white' strokeWidth={2} path='straight' headSize={0}></Xarrow>;
+                    return <Xarrow start={`${el.start}`} end={`${el.end}`} color='#9BD678' strokeWidth={2} path='straight' headSize={0}></Xarrow>;
                 })}
 
         </div>
