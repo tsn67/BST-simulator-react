@@ -16,7 +16,7 @@ export default ({ value, id }) => {
         const handleScreenSize = () => {
             const width = window.innerWidth;
             if (width < 768) {
-                setFontSize(fontValues[value.toString().length - 1] - 0.4);
+                setFontSize(fontValues[value.toString().length - 1] - 0.5);
             } else {
                 setFontSize(fontValues[value.toString().length - 1]);
             }
@@ -32,7 +32,7 @@ export default ({ value, id }) => {
     return (
         <div
             id={id}
-            className={` rounded-full md:w-[60px] md:h-[60px] w-[40px] h-[40px] bg-nodeGreen outline-[2px] outline-textGreenLight grid place-content-center`}
+            className={` rounded-full min-h-[40px] min-w-[40px] md:min-w-[60px] md:min-h-[60px]  bg-nodeGreen outline-[2px] outline-textGreenLight grid place-content-center`}
         >
             <h1
                 style={{ fontSize: `${fontSize}rem` }}

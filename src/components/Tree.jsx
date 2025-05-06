@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import Node from './Node';
-import Xarrow, { Xwrapper } from 'react-xarrows';
+import React, { useEffect, useRef, useState } from 'react';
 import { updateContollerStore } from '../store/updateStore';
 import { TreeStore } from '../store/TreeStore';
 import TreeNode from '../utils/TreeNode';
 import { visualStore } from '../store/VisualStore';
+import Node from './Node';
+import panzoom from 'panzoom';
+import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
 
 export default () => {
     const rootNode = TreeStore(state => state.root);
@@ -14,12 +15,23 @@ export default () => {
     const addNewNode = TreeStore(state => state.addNode);
     const nodes = visualStore.getState().nodes;
     const xArrowIds = visualStore.getState().xArrowIds;
+    const treeContainerRef = useRef(null);
 
     useEffect(() => {
         //timeout is performed to trigger a render to update the xarrows correctly
         const timeOut = setTimeout(() => {
             setRender(prev => !prev);
         }, 100);
+
+        if (treeContainerRef.current) {
+            const instance = panzoom(treeContainerRef.current, {
+                maxZoom: 1,
+                minZoom: 1,
+                bounds: true,
+                boundsPadding: 0.01,
+            });
+
+        }
 
         updateRootNode(new TreeNode(10));
         addNewNode(7);
@@ -32,7 +44,11 @@ export default () => {
         addNewNode(6);
         addNewNode(14);
         addNewNode(12);
-
+        addNewNode(1001);
+        addNewNode(0);
+        addNewNode(1002);
+        addNewNode(2002);
+        addNewNode(4001);
         return () => {
             clearTimeout(timeOut);
         };
@@ -51,57 +67,55 @@ export default () => {
 
     //testing purpose
     return (
-        <Xwrapper>
-            <div className="">
-                <TreeContainer nodes={nodes} xArrowIds={xArrowIds}></TreeContainer>
+            <div className="" ref={treeContainerRef}>
+                <TreeContainer render={render}  nodes={nodes} xArrowIds={xArrowIds}></TreeContainer>
             </div>
-        </Xwrapper>
     );
 };
 
-const TreeContainer = ({ xArrowIds, nodes }) => {
+const TreeContainer = ({ xArrowIds, nodes, refObj, render }) => {
+
+    useEffect(() => {
+        const timeOut = setTimeout(() => {
+            useXarrow();
+        }, 100);
+
+        return () => {
+            clearTimeout(timeOut);
+        }
+    }, []);
+
+
     return (
-        <>
-            <div className="md:min-w-[50vw] min-w-screen flex flex-col gap-[40px] bg-transparent">
-                {nodes && (
-                    <>
-                        {nodes.map((el, i) => {
-                            if(i == nodes.length - 1) return; //elminate the last level from visual representation
-                            return (
-                                <div className="w-full   flex flex-row  justify-center">
+    <Xwrapper>
+        <div className="flex flex-col gap-10" ref={refObj}>
+            {nodes &&
+                nodes.map((el, i) => {
+                    if (i == nodes.length - 1) return;
+                    else {
+                        return (
+                            <div className="flex justify-center flex-row gap-10">
+                                {el.map((n, j) => {
+                                    if (n == -1) {
+                                        return (
+                                            <div className=" mr-4 rounded-full bg-transparent"></div>
+                                        );
+                                    } else {
+                                        return <Node value={n.value} id={`${n.value}`}></Node>;
+                                    }
+                                })}
+                            </div>
+                        );
+                    }
+                })}
 
-                                    {el.map((node, index) => {
-                                        if (node == -1) {
-                                            return (
-                                                <div className="w-[40px] h-[40px] bg-transparent m-[10px] rounded-full"></div>
-                                            );
-                                        } else {
-                                            return <div className='m-[10px]'><Node id={`${node.value}`} value={node.value}></Node></div>;
-                                        }
-                                    })}
-                                </div>
-                            );
-                        })}
-                    </>
-                )}
+            {xArrowIds &&
+                xArrowIds.map((el, i) => {
+                    return <Xarrow start={`${el.start}`} end={`${el.end}`} color='white' strokeWidth={2} path='straight' headSize={0}></Xarrow>;
+                })}
 
-                {xArrowIds && (
-                    <>
-                        {xArrowIds.map(el => {
-                            return (
-                                <Xarrow
-                                    start={`${el.start}`}
-                                    end={`${el.end}`}
-                                    path="straight"
-                                    color="#9BD678"
-                                    headSize={0}
-                                    strokeWidth={2}
-                                ></Xarrow>
-                            );
-                        })}
-                    </>
-                )}
-            </div>
-        </>
+        </div>
+
+    </Xwrapper>
     );
 };
