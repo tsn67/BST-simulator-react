@@ -1,13 +1,18 @@
-import React, { useRef, useState } from 'react';
-import Node from '../components/Node';
+import React, { useEffect, useRef, useState } from 'react';
+import Tree from '../components/Tree';
+import { updateContollerStore } from '../store/updateStore';
 
 export default () => {
 
 
+    // scrolling based on mouse press and move (for pc)
     const containerRef = useRef(null);
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
     const [scrollPos, setScrollPos] = useState({ left: 0, top: 0 });
+
+    // zustand store related method
+    const updateStatus = updateContollerStore(state => state.updateState);
 
     const handleMouseDown = e => {
         setIsDragging(true);
@@ -16,6 +21,7 @@ export default () => {
             left: containerRef.current.scrollLeft,
             top: containerRef.current.scrollTop,
         });
+        updateStatus();
     };
 
     const handleMouseMove = e => {
@@ -24,10 +30,25 @@ export default () => {
         const dy = e.clientY - startPos.y;
         containerRef.current.scrollLeft = scrollPos.left - dx;
         containerRef.current.scrollTop = scrollPos.top - dy;
+        updateStatus();
     };
 
     const handleMouseUp = () => setIsDragging(false);
     const handleMouseLeave = () => setIsDragging(false);
+
+
+    //tree update (xarrows) on scroll
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        const handleWheel = () => updateStatus();
+
+        container.addEventListener('scroll', handleWheel);
+        return () => {
+            container.removeEventListener('scroll', handleWheel);
+        };
+    }, [containerRef.current]);
 
     return (
         <div
@@ -38,12 +59,7 @@ export default () => {
             ref={containerRef}
             className="h-screen w-screen bg-background flex flex-col items-center  overflow-scroll"
         >
-
-            <div className="flex flex-col gap-20">
-                {new Array(20).fill(0).map((element, index) => {
-                    return <Node value={index}></Node>;
-                })}
-            </div>
+            <Tree></Tree>
         </div>
     );
 };
