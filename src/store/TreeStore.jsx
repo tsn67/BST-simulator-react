@@ -17,6 +17,7 @@ const TreeStore = create((set, get) => {
             if(!result.msg) {
                 set(() => ({root: result.root}));
                 visualStore.getState().addNewNode(result.parentValue, result.direction, nodeValue, result.level);
+                visualStore.getState().addnewXarrow(result.parentValue, nodeValue);
             }
         }
     }

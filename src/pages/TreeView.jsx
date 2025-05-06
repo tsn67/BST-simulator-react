@@ -57,7 +57,7 @@ export default () => {
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseLeave}
             ref={containerRef}
-            className="h-screen w-screen bg-background flex flex-col items-center  overflow-scroll"
+            className="h-screen w-screen bg-background p-12 flex flex-row justify-center overflow-scroll"
         >
             <Tree></Tree>
         </div>
