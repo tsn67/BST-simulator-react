@@ -7,7 +7,7 @@ const addTreeNode = (newValue, root) => {
     //perform the search for the positoin to insert
     if (root == null) {
         return {
-            msg: 'error! tree is empty!',
+            root: new TreeNode(newValue)
         };
     }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useReducer, useRef, useState } from 'react';
 import { updateContollerStore } from '../store/updateStore';
 import { TreeStore } from '../store/TreeStore';
 import TreeNode from '../utils/TreeNode';
@@ -6,7 +6,7 @@ import { visualStore } from '../store/VisualStore';
 import Node from './Node';
 import panzoom from 'panzoom';
 import Xarrow, { useXarrow, Xwrapper } from 'react-xarrows';
-
+import getNodePosition from '../utils/NodePosition';
 
 export default () => {
     const rootNode = TreeStore(state => state.root);
@@ -31,87 +31,106 @@ export default () => {
                 bounds: true,
                 boundsPadding: 0.01,
             });
-
         }
 
         updateRootNode(new TreeNode(10));
-        addNewNode(7);
-        addNewNode(6);
-        addNewNode(5);
-        addNewNode(4);
-        addNewNode(11);
-        addNewNode(7);
+        addNewNode(9);
+        addNewNode(100);
         addNewNode(8);
-        addNewNode(6);
-        addNewNode(14);
-        addNewNode(12);
         addNewNode(1001);
-        addNewNode(0);
-        addNewNode(1002);
-        addNewNode(2002);
-        addNewNode(4001);
+        addNewNode(2001);
+        addNewNode(901);
+
         return () => {
             clearTimeout(timeOut);
         };
     }, []);
 
-    useEffect(() => {
-        console.log(rootNode);
-    }, [rootNode]);
+    useEffect(() => {}, [rootNode]);
 
     useEffect(() => {}, [updateStatus]);
 
-    useEffect(() => {
-        console.log(nodes);
-        console.log(xArrowIds);
-    }, [nodes, xArrowIds]);
+    useEffect(() => {}, [nodes, xArrowIds]);
 
     //testing purpose
     return (
-            <div className="" ref={treeContainerRef}>
-                <TreeContainer render={render}  nodes={nodes} xArrowIds={xArrowIds}></TreeContainer>
-            </div>
+        <div className="">
+            <TreeContainer rootNode={rootNode} containerRef={treeContainerRef}></TreeContainer>
+        </div>
     );
 };
 
-const TreeContainer = ({ xArrowIds, nodes, refObj, render }) => {
-
-    const updateStatus = updateContollerStore.getState().updateStatus;
+const TreeContainer = () => {
+    const [nodePositions, setNodePositions] = useState([]);
+    const rootNode = TreeStore(state => state.root);
+    const containerRef = useRef(null);
 
     useEffect(() => {
-    }, [updateStatus]);
+        if (containerRef.current) {
+            panzoom(containerRef.current, {
+                maxZoom: 3,
+                minZoom: 0.6,
+                bounds: true,
+                boundsPadding: 0.01,
+            });
+        }
+    }, []);
 
+    useEffect(() => {
+        if (rootNode != null) {
+            const positions = [];
+
+            // Add root node
+            positions.push({
+                left: 0,
+                top: 0,
+                value: rootNode.value,
+            });
+
+            // Recursive traversal
+            function traverseTree(node, parent) {
+                if (!node || !parent) return;
+                const parentPos = positions.find(p => p.value === parent.value);
+                if (!parentPos) return;
+
+                const pos = getNodePosition(parent.value, node.value, parentPos.left, parentPos.top);
+                positions.push({
+                    left: pos.left,
+                    top: pos.top,
+                    value: node.value,
+                });
+
+                traverseTree(node.left, node);
+                traverseTree(node.right, node);
+            }
+
+            traverseTree(rootNode.left, rootNode);
+            traverseTree(rootNode.right, rootNode);
+
+            // Once traversal is done, set state
+            setNodePositions(prev => positions);
+        }
+    }, [rootNode]);
+
+    useEffect(() => {
+        console.log(nodePositions);
+    }, [nodePositions]);
 
     return (
-    <Xwrapper>
-        <div className="flex flex-col gap-10" ref={refObj}>
-            {nodes &&
-                nodes.map((el, i) => {
-                    if (i == nodes.length - 1) return;
-                    else {
+        <Xwrapper>
+            <div ref={containerRef} className="relative w-screen h-screen grid ">
+                {nodePositions.length != 0 &&
+                    nodePositions.map((el, i) => {
+                        {
+                            console.log(el);
+                        }
                         return (
-                            <div className="flex justify-center flex-row gap-10">
-                                {el.map((n, j) => {
-                                    if (n == -1) {
-                                        return (
-                                            <div className=" mr-4 rounded-full bg-transparent"></div>
-                                        );
-                                    } else {
-                                        return <Node value={n.value} id={`${n.value}`}></Node>;
-                                    }
-                                })}
+                            <div style={{ left: `${el.left}px`, top: `${el.top}px` }} className={`absolute`}>
+                                <Node value={el.value}></Node>
                             </div>
                         );
-                    }
-                })}
-
-            {xArrowIds &&
-                xArrowIds.map((el, i) => {
-                    return <Xarrow start={`${el.start}`} end={`${el.end}`} color='#9BD678' strokeWidth={2} path='straight' headSize={0}></Xarrow>;
-                })}
-
-        </div>
-
-    </Xwrapper>
+                    })}
+            </div>
+        </Xwrapper>
     );
 };

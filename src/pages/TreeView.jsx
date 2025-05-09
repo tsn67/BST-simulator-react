@@ -8,7 +8,7 @@ export default () => {
 
     return (
         <div
-           className="h-screen w-screen bg-background  overflow-scroll"
+           className="h-screen w-screen bg-background grid place-content-center"
         >
             <Tree></Tree>
         </div>
