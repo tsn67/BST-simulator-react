@@ -32,7 +32,7 @@ export default ({ value, id }) => {
     return (
         <div
             id={id}
-            className={` rounded-full min-h-[40px] min-w-[40px] md:min-w-[60px] md:min-h-[60px]  bg-nodeGreen outline-[2px] outline-textGreenLight grid place-content-center`}
+            className={` rounded-full z-50 min-h-[40px] min-w-[40px] md:min-w-[60px] md:min-h-[60px]  bg-nodeGreen outline-[2px] outline-textGreenLight grid place-content-center`}
         >
             <h1
                 style={{ fontSize: `${fontSize}rem` }}
